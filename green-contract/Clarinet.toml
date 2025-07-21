@@ -10,6 +10,11 @@ path = 'contracts/funds-allocation.clar'
 clarity_version = 3
 epoch = 3.0
 
+[contracts.impact-bond]
+path = 'contracts/impact-bond.clar'
+clarity_version = 3
+epoch = 3.0
+
 [contracts.project-registration]
 path = 'contracts/project-registration.clar'
 clarity_version = 3
