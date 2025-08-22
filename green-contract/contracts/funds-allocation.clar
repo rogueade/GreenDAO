@@ -101,7 +101,7 @@
     )
     
     ;; Record transaction for audit
-    (record-transaction new-project-id none "PROJECT_CREATED" u0 none)
+    (unwrap-panic (record-transaction new-project-id none "PROJECT_CREATED" u0 none))
     
     ;; Return the new project ID
     (ok new-project-id)
@@ -124,7 +124,7 @@
     )
     
     ;; Record transaction for audit
-    (record-transaction project-id none "APPROVER_ADDED" u0 none)
+    (unwrap-panic (record-transaction project-id none "APPROVER_ADDED" u0 none))
     
     (ok true)
   )
@@ -154,7 +154,7 @@
     )
     
     ;; Record transaction for audit
-    (record-transaction project-id none "FUNDS_ADDED" amount none)
+    (unwrap-panic (record-transaction project-id none "FUNDS_ADDED" amount none))
     
     (ok true)
   )
@@ -191,7 +191,7 @@
     )
     
     ;; Record transaction for audit
-    (record-transaction project-id (some milestone-id) "MILESTONE_ADDED" u0 none)
+    (unwrap-panic (record-transaction project-id (some milestone-id) "MILESTONE_ADDED" u0 none))
     
     (ok true)
   )
@@ -231,7 +231,7 @@
     )
     
     ;; Record transaction for audit
-    (record-transaction project-id (some milestone-id) "MILESTONE_VERIFIED" u0 none)
+    (unwrap-panic (record-transaction project-id (some milestone-id) "MILESTONE_VERIFIED" u0 none))
     
     (ok true)
   )
@@ -285,7 +285,7 @@
     )
     
     ;; Record transaction for audit
-    (record-transaction project-id (some milestone-id) "FUNDS_RELEASED" milestone-amount (some (get owner project)))
+    (unwrap-panic (record-transaction project-id (some milestone-id) "FUNDS_RELEASED" milestone-amount (some (get owner project))))
     
     (ok true)
   )
@@ -295,14 +295,17 @@
 (define-read-only (calculate-milestone-amount (project-id uint) (milestone-id uint))
   (let
     (
-      (project (unwrap! (map-get? projects { project-id: project-id }) (err ERR-PROJECT-NOT-FOUND)))
-      (milestone (unwrap! (map-get? milestones { project-id: project-id, milestone-id: milestone-id }) (err ERR-MILESTONE-NOT-FOUND)))
+      (project (default-to 
+                 { owner: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM, total-funds: u0, available-funds: u0, required-approvals: u0, active: false, created-at: u0 }
+                 (map-get? projects { project-id: project-id })))
+      (milestone (default-to 
+                   { description: "", funds-percentage: u0, verified: false, funds-released: false, approval-count: u0, created-at: u0 }
+                   (map-get? milestones { project-id: project-id, milestone-id: milestone-id })))
       (percentage (get funds-percentage milestone))
       (total-funds (get total-funds project))
     )
     ;; Calculate amount based on percentage of total funds
     (/ (* total-funds percentage) u100)
-    (ok true)
   )
 )
 
@@ -335,7 +338,7 @@
       }
     )
     
-    new-tx-id
+    (ok new-tx-id)
   )
 )
 

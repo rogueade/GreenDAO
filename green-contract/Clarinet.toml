@@ -5,6 +5,11 @@ authors = []
 telemetry = true
 cache_dir = '.\.cache'
 requirements = []
+[contracts.DAO-governace]
+path = 'contracts/DAO-governace.clar'
+clarity_version = 3
+epoch = 3.0
+
 [contracts.funds-allocation]
 path = 'contracts/funds-allocation.clar'
 clarity_version = 3
